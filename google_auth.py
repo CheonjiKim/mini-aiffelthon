@@ -3,8 +3,10 @@ from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from db_helper import save_credentials, load_credentials
-
+ 
 SCOPES = [
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.send',
     'https://www.googleapis.com/auth/gmail.modify',
@@ -12,10 +14,23 @@ SCOPES = [
     'https://www.googleapis.com/auth/calendar.events'
 ]
 
+import requests
+
+def get_user_informations(credentials):
+    """Google 사용자 프로필 정보 가져오기"""
+    headers = {'Authorization': f'Bearer {credentials.token}'}
+    response = requests.get('https://www.googleapis.com/oauth2/v1/userinfo', headers=headers)
+    if response.ok:
+        return response.json()  # contains 'id', 'email', 'name', etc.
+    else:
+        raise Exception("Failed to fetch user info", response.text)
+
 def create_oauth_flow(redirect_uri):
     """OAuth 인증 흐름 생성"""
     client_config = {
         "web": {
+            "user_profile": "https://www.googleapis.com/auth/userinfo.profile",
+            "user_email": "https://www.googleapis.com/auth/userinfo.email",
             "client_id": os.getenv("GOOGLE_CLIENT_ID"),
             "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
@@ -37,16 +52,22 @@ def get_authorization_url(flow):
 def fetch_token(flow, code):
     """인증 코드로 토큰 가져오기"""
     flow.fetch_token(code=code)
-    return flow.credentials
+    credentials = flow.credentials
+    user_info = get_user_informations(credentials)
+    user_email = user_info['email']
+    save_credentials(credentials, user_email)
+    print("DEBUG: User info:", user_info)
+    print("DEBUG: User email:", user_email)
+    return credentials
 
-def is_authenticated(user_id="default_user"):
+def is_authenticated(user_email="no email"):
     """사용자 인증 여부 확인"""
-    credentials = load_credentials(user_id)
+    credentials = load_credentials(user_email)
     if credentials:
         # 토큰이 만료된 경우 갱신
         if credentials.expired and credentials.refresh_token:
             credentials.refresh(Request())
-            save_credentials(credentials, user_id)
+            save_credentials(credentials, user_email)
         return True
     return False
 

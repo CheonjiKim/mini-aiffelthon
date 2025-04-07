@@ -36,10 +36,8 @@ from langchain_core.runnables import RunnableConfig
 from langchain_upstage import ChatUpstage
 
 # Google 인증 관련 모듈 임포트
-from google_auth import (
-    create_oauth_flow, get_authorization_url, fetch_token,
-    build_gmail_service, build_calendar_service
-)
+from google_auth import create_oauth_flow, get_authorization_url, \
+fetch_token, get_user_informations, build_gmail_service, build_calendar_service
 
 from db_helper import (save_credentials, load_credentials, is_authenticated, init_db)
 
@@ -766,7 +764,8 @@ with tab1:
                     # 4. 토큰 가져오기
                     auth_code = query_params['code']
                     credentials = fetch_token(st.session_state.flow, auth_code)
-                    save_credentials(credentials)
+                    print(f"DEBUG: Retrieved credentials: {credentials}")
+                    save_credentials(credentials, )
                     
                     if initialize_google_services():
                         st.session_state.google_authenticated = True
