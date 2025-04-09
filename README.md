@@ -9,7 +9,7 @@
 
 ## 🧠 프로젝트 개요
 
-**나만의 비서 나비(Nabi)**는 LangGraph ReAct 에이전트와 MCP(Model Context Protocol)를 활용하여 사용자의 일상을 돕는 AI 비서 애플리케이션입니다. Streamlit으로 구축된 웹 인터페이스를 통해 사용자와 상호작용하며, Upstage Solar LLM을 기반으로 작동합니다.
+나만의 비서 나비(Nabi)는 LangGraph ReAct 에이전트와 MCP(Model Context Protocol)를 활용하여 사용자의 일상을 돕는 AI 비서 애플리케이션입니다. Streamlit으로 구축된 웹 인터페이스를 통해 사용자와 상호작용하며, Upstage Solar LLM을 기반으로 작동합니다.
 
 나비는 MCP를 통해 다양한 도구와 연동됩니다:
 *   **날씨 정보**: 사용자의 현재 위치를 기반으로 날씨를 알려줍니다 (`mcp_server_local.py`).
